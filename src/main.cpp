@@ -58,49 +58,58 @@ public:
     {
         while (window.isOpen())
         {
-            while (const std::optional event = window.pollEvent())
+            handleEvents();
+            render();
+        }
+    }
+
+    void handleEvents()
+    {
+        while (const std::optional event = window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>())
             {
-                if (event->is<sf::Event::Closed>())
-                {
-                    window.close();
-                }
+                window.close();
+            }
 
-                if (const auto& mouseButton = event->getIf<sf::Event::MouseButtonPressed>())
+            if (const auto& mouseButton = event->getIf<sf::Event::MouseButtonPressed>())
+            {
+                if (mouseButton->button == sf::Mouse::Button::Left)
                 {
-                    if (mouseButton->button == sf::Mouse::Button::Left)
+                    if (!sessionOver())
                     {
-                        if (!sessionOver())
-                        {
-                            placeFigure(mouseButton->position);
-                        }
-                        else if (hoverRestartBtn(mouseButton->position))
-                        {
-                            restart();
-                        }
+                        placeFigure(mouseButton->position);
                     }
-                }
-
-                if (const auto& keyPressed = event->getIf<sf::Event::KeyPressed>())
-                {
-                    if (keyPressed->code == sf::Keyboard::Key::R)
+                    else if (hoverRestartBtn(mouseButton->position))
                     {
                         restart();
                     }
                 }
             }
 
-            window.clear(sf::Color(167, 185, 225));
-
-            window.draw(grid);
-
-            if (sessionOver())
+            if (const auto& keyPressed = event->getIf<sf::Event::KeyPressed>())
             {
-                displayWinner();
-                showRestartBtn();
+                if (keyPressed->code == sf::Keyboard::Key::R && sessionOver())
+                {
+                    restart();
+                }
             }
-
-            window.display();
         }
+    }
+
+    void render()
+    {
+        window.clear(sf::Color(167, 185, 225));
+
+        window.draw(grid);
+
+        if (sessionOver())
+        {
+            displayWinner();
+            showRestartBtn();
+        }
+
+        window.display();
     }
 
     bool sessionOver() const
@@ -130,7 +139,7 @@ public:
 
     void placeFigure(const sf::Vector2i& mousePos)
     {
-        Figure pending = crossMove ? Figure::Cross : Figure::Circle;
+        const Figure pending = crossMove ? Figure::Cross : Figure::Circle;
         const bool placedSuccessfully = grid.placeFigure(pending, window.mapPixelToCoords(mousePos));
         if (placedSuccessfully)
         {
@@ -216,7 +225,7 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 int main()
 #endif
 {
-    Settings settings{
+    const Settings settings{
         .windowWidth = 800u,
         .windowHeight = 600u,
         .title = "Tic-Tac-Toe",
