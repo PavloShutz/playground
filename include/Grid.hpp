@@ -2,6 +2,7 @@
 #define _GRID_HPP
 
 #include <algorithm>
+#include <cassert>
 
 #include <SFML/Graphics.hpp>
 

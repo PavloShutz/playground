@@ -21,6 +21,7 @@ add_executable(main
     src/Cell.cpp
     src/Figure.cpp
     src/Grid.cpp
+    src/Game.cpp
 )
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Audio)
 add_dependencies(main copy_assets)
